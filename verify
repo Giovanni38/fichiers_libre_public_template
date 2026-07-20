@@ -1,0 +1,24 @@
+USE [master];
+GO
+
+SELECT
+    s.session_id,
+    s.login_name,
+    s.original_login_name,
+    s.host_name,
+    s.program_name,
+    s.status,
+    DB_NAME(s.database_id) AS database_name,
+    s.login_time,
+    s.last_request_start_time,
+    s.last_request_end_time
+FROM sys.dm_exec_sessions AS s
+WHERE
+    s.is_user_process = 1
+    AND s.session_id <> @@SPID
+    AND ISNULL(s.login_name, '') COLLATE Latin1_General_100_CI_AI
+        NOT LIKE '%IGL%'
+ORDER BY
+    s.login_name,
+    s.session_id;
+GO

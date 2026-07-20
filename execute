@@ -1,0 +1,46 @@
+USE [master];
+GO
+
+SET NOCOUNT ON;
+
+DECLARE @Executer bit = 0;
+-- 0 = simulation uniquement
+-- 1 = exécution réelle des commandes KILL
+
+DECLARE @Commandes nvarchar(max) = N'';
+
+SELECT
+    @Commandes = @Commandes
+        + N'KILL '
+        + CONVERT(nvarchar(10), s.session_id)
+        + N';'
+        + CHAR(13)
+        + CHAR(10)
+FROM sys.dm_exec_sessions AS s
+WHERE
+    s.is_user_process = 1
+    AND s.session_id <> @@SPID
+    AND ISNULL(s.login_name, '') COLLATE Latin1_General_100_CI_AI
+        NOT LIKE '%IGL%';
+
+IF NULLIF(@Commandes, N'') IS NULL
+BEGIN
+    PRINT N'Aucune session à interrompre.';
+    RETURN;
+END;
+
+PRINT N'Commandes qui seront exécutées :';
+PRINT @Commandes;
+
+IF @Executer = 1
+BEGIN
+    PRINT N'Interruption des sessions en cours...';
+    EXEC sys.sp_executesql @Commandes;
+    PRINT N'Interruption terminée.';
+END
+ELSE
+BEGIN
+    PRINT N'MODE SIMULATION : aucune session n''a été interrompue.';
+    PRINT N'Après validation, remplacer @Executer = 0 par @Executer = 1.';
+END;
+GO

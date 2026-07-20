@@ -1,0 +1,44 @@
+Bonjour à tous,
+
+Veuillez trouver ci-dessous le compte rendu de la réunion concernant l'application Share In V1 S1005.
+
+1. Hébergement de l'application
+L'application Share In V1 S1005 n'est pas hébergée sur Apollo.
+Elle est actuellement hébergée sur un Cloud Privatif CANE de la Caisse Régionale Nord Est (CR NE).
+Par conséquent, aucune migration vers KOSMOS n'est prévue à ce stade.
+L'application est maintenue en attendant la future V2, qui sera prise en charge par la squad Cash Management.
+2. Infrastructure actuelle
+
+Les serveurs sont toujours hébergés au sein de la CR Nord Est.
+
+Environnement identifié :
+
+Serveur	Adresse IP	Environnement	Rôle
+CW01PNECSP00	10.70.101.29	DEV	SQL Server 2016 + ExR SIDV2
+CW01PNECSP01	10.70.101.38	DEV	IIS + PHP
+CW01PNECSP02	10.70.101.39	PROD	SQL Server 2016 + ExR SIDV2
+CW01PNECSP03	10.70.101.40	PROD	IIS + PHP
+3. Obsolescence des serveurs
+Les serveurs actuellement utilisés seront obsolètes à partir de janvier 2027.
+Une migration vers une nouvelle infrastructure devra être réalisée.
+La question de la responsabilité de cette migration reste à clarifier. Au regard de l'hébergement actuel, il semble que cette opération relève de la CR Nord Est, propriétaire de l'infrastructure.
+4. Problématique liée à Windows 25H2
+
+Une incompatibilité a été identifiée avec la mise à jour Windows 25H2.
+
+Les pistes évoquées sont les suivantes :
+
+Faire évoluer le mode d'authentification.
+Abandonner l'authentification NTLM/PicAuth au profit du mécanisme AUC9.
+Déterminer précisément le mode d'authentification à mettre en œuvre.
+Étudier une solution de contournement permettant d'assurer le fonctionnement de l'application en attendant la mise en place de la solution définitive.
+5. Points de vigilance
+Confirmer l'architecture cible pour la migration des serveurs.
+Identifier le responsable de la migration de l'infrastructure.
+Valider le remplacement du mécanisme d'authentification actuel par AUC9.
+Définir une solution transitoire afin de garantir la compatibilité avec Windows 25H2.
+
+N'hésitez pas à compléter ou corriger ce compte rendu si certains éléments doivent être précisés.
+
+Cordialement,
+Giovanni

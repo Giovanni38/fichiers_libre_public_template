@@ -1,0 +1,23 @@
+﻿source;cible;decision;regle_migration
+utilisateur_app;administrateur;Renommer et réduire;"login_utilisateur→identifiant; actif→est_actif; supprimer password/structure/matricule si toujours vides"
+application;application;Restructurer;"old_id hors métier; libelle→nom; description_fonctionnelle→description; supprimer version_production_id/date_derniere_mep et calculer depuis version"
+version_application;version;Remplacer;"Conserver identité/cycle de vie; migrer contacts, langages, déploiements; archiver les colonnes legacy non couvertes par les écrans"
+application_contact;-;Supprimer;Table vide et contacts attendus au niveau version
+version_contact;version_contact;Conserver;"Normaliser les dates; historisation par rôle"
+fabricant_contact;-;Supprimer;"Table vide; contact fabricant porté par version_contact avec rôle FABRICANT"
+fabricant_type;type_fabricant;Renommer;Référentiel valide INTERNE/EDITEUR/PRESTATAIRE/OPEN_SOURCE
+fabricant;fabricant;Conserver;"Renommer actif/date_*; FK vers type_fabricant"
+fabricant_filtre;-;Supprimer;"Duplication technique de fabricant; filtrer directement sur fabricant"
+langage_programmation;langage_programmation;Conserver;"Référentiel valide; compléter les codes si besoin"
+version_langage;version_langage;Conserver et alimenter;"Ajouter version_technique, est_principal, commentaire; migrer les technologies reconnues"
+statut;statut;Restructurer;Ajouter perimetre APPLICATION/VERSION pour éviter le mélange sémantique
+etape_version;phase_version;Renommer et recaler;Aligner les valeurs sur décisions métier: Nouveau/Développement/Pilote/Production/Décommissionnement
+type_metier;domaine_metier;Renommer;"Les données existantes sont des domaines; table metier est vide"
+metier;-;Supprimer;"Table vide; éviter une hiérarchie artificielle non utilisée"
+ListeCR;caisse_regionale;Réduire;"Conserver code, nom, code_mnemonique; archiver les colonnes historiques non utilisées"
+application_dependance;dependance_application;Conserver et activer;Table vide mais besoin obligatoire confirmé par le cahier de besoins
+application_document + version_document;document;Fusionner;Une table avec contrainte parent application XOR version
+historique_application;journal_action;Remplacer;Journal des actions application/version, utilisateur admin, avant/après JSON optionnels
+listes_diffusion + liaison_liste_diffusion_contact;-;Supprimer;Tables vides et périmètre explicitement retiré
+login_trace;trace_connexion;Renommer;Conserver avec politique de rétention
+incident_lecture_donnees;incident_technique;Renommer;Conserver comme table technique avec rétention

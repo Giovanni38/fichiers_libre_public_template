@@ -1,0 +1,52 @@
+# ============================================================
+# BLOCAGE COMPLET DU SITE
+# Compatible avec Apache 2.0 et Apache < 2.2
+# ============================================================
+
+# Désactive l’affichage du contenu des dossiers
+Options -Indexes
+
+# Active le moteur de réécriture
+RewriteEngine On
+
+# ------------------------------------------------------------
+# BLOCAGE PAR MOD_REWRITE
+# ------------------------------------------------------------
+
+# Bloque toutes les requêtes
+RewriteRule ^.*$ - [F,L]
+
+# ------------------------------------------------------------
+# BLOCAGE PAR CONTRÔLE D’ACCÈS APACHE < 2.2
+# ------------------------------------------------------------
+
+Order Allow,Deny
+Deny from all
+
+# ------------------------------------------------------------
+# PAGE D’ERREUR PERSONNALISÉE FACULTATIVE
+# ------------------------------------------------------------
+
+# Utiliser cette ligne seulement si le fichier 403.html existe
+# ErrorDocument 403 /403.html
+
+# Message simple sans fichier HTML externe
+ErrorDocument 403 "Accès interdit : ce site est temporairement indisponible."
+
+# ------------------------------------------------------------
+# PROTECTION DU FICHIER .HTACCESS
+# ------------------------------------------------------------
+
+<Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ------------------------------------------------------------
+# PROTECTION DE FICHIERS SENSIBLES
+# ------------------------------------------------------------
+
+<FilesMatch "^(\.env|\.git|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|README.*|.*\.sql|.*\.log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

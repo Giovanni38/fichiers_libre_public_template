@@ -1,42 +1,94 @@
-# AUDIT DE SÉCURITÉ COMPLET DU PROJET — MODE LECTURE SEULE
+# AUDIT DE SÉCURITÉ COMPLET DU REPOSITORY + GÉNÉRATION AUTOMATIQUE DU RAPPORT MARKDOWN
 
-Tu es un **expert senior en cybersécurité, audit de code, sécurité applicative .NET, pentest Web/API, WCF/SOAP, SQL Server, Docker et DevSecOps**.
+Tu es un **expert senior en cybersécurité, audit de code source, AppSec, pentest, .NET/.NET Framework, WCF/SOAP, SQL Server, Docker et DevSecOps**.
 
-Je veux que tu réalises un **audit de sécurité exhaustif de l'intégralité de ce dépôt Git**, comme si l'application allait subir prochainement :
+Ta mission est d'effectuer un **audit de sécurité exhaustif de l'intégralité de ce repository**, comme si cette application devait subir prochainement :
 
 * un test d'intrusion externe ;
 * un test d'intrusion interne ;
-* une revue de code sécuritaire ;
+* une revue de code sécurité ;
 * un audit OWASP ;
-* un audit de configuration ;
 * une analyse SAST ;
 * une analyse des dépendances ;
 * une recherche de secrets ;
-* une revue d'architecture.
-
-## RÈGLE ABSOLUE
-
-**NE MODIFIE AUCUN FICHIER.**
-
-Ne fais :
-
-* aucun refactoring ;
-* aucune correction automatique ;
-* aucun changement de dépendance ;
-* aucun formatage ;
-* aucune migration ;
-* aucun commit ;
-* aucune modification de configuration.
-
-Je veux uniquement un **rapport d'audit détaillé avec preuves et recommandations**.
+* un audit de configuration ;
+* une revue d'architecture sécurité.
 
 ---
 
-# 1. PÉRIMÈTRE À ANALYSER
+# 0. LIVRABLE OBLIGATOIRE
 
-Analyse **récursivement l'intégralité du repository**, sans te limiter aux fichiers ouverts dans l'IDE.
+Tu dois **créer réellement un fichier Markdown** à la racine du repository :
 
-L'arborescence contient notamment :
+```text
+SECURITY_AUDIT.md
+```
+
+Le résultat complet de l'audit doit être écrit dans ce fichier.
+
+## RÈGLE ABSOLUE SUR LES MODIFICATIONS
+
+Tu n'as le droit de créer ou modifier **qu'un seul fichier** :
+
+```text
+SECURITY_AUDIT.md
+```
+
+Tu ne dois modifier **AUCUN fichier de l'application**.
+
+Interdiction de :
+
+* corriger automatiquement le code ;
+* modifier un `.cs` ;
+* modifier un `.json` ;
+* modifier un `.config` ;
+* modifier un `.csproj` ;
+* modifier un `.sln` ;
+* modifier un fichier SQL ;
+* modifier Docker ;
+* changer une dépendance ;
+* lancer un refactoring ;
+* formater les fichiers ;
+* générer une migration ;
+* supprimer un fichier ;
+* déplacer un fichier ;
+* renommer un fichier ;
+* effectuer un commit ;
+* modifier les tests ;
+* appliquer automatiquement les recommandations de sécurité.
+
+### SEULE EXCEPTION AUTORISÉE
+
+Création ou mise à jour de :
+
+```text
+SECURITY_AUDIT.md
+```
+
+Si `SECURITY_AUDIT.md` existe déjà, **remplace son contenu par le nouvel audit complet**.
+
+À la fin de ta tâche, le seul changement détectable par Git doit être idéalement :
+
+```text
+SECURITY_AUDIT.md
+```
+
+---
+
+# 1. NE PAS SE LIMITER AU CONTEXTE OUVERT
+
+Tu dois réellement **parcourir récursivement l'intégralité du repository**.
+
+Ne te limite pas :
+
+* au fichier actuellement ouvert ;
+* aux fichiers visibles dans l'éditeur ;
+* aux fichiers mentionnés dans cette consigne ;
+* aux fichiers récemment modifiés.
+
+Commence par inventorier réellement le repository.
+
+Le repository contient notamment une structure proche de :
 
 ```text
 /
@@ -60,7 +112,9 @@ L'arborescence contient notamment :
 │       ├── AnalysisReport.sarif
 │       ├── ServiceTrace.svc.cs
 │       ├── ServiceTracePriv.sln
-│       └── ...
+│       ├── ServiceTracePriv.suo
+│       ├── ServiceTracePriv.V12.suo
+│       └── autres fichiers
 ├── tests/
 ├── .browserslistrc
 └── autres fichiers du repository
@@ -68,122 +122,174 @@ L'arborescence contient notamment :
 
 Cette liste n'est **pas exhaustive**.
 
-Commence par inventorier réellement tous les fichiers présents.
-
-Analyse également :
-
-* fichiers cachés ;
-* fichiers de configuration ;
-* fichiers Docker ;
-* scripts SQL ;
-* fichiers XML ;
-* JSON ;
-* `.config` ;
-* `.csproj` ;
-* `.sln` ;
-* fichiers WCF/SOAP ;
-* fichiers de CI/CD s'ils existent ;
-* scripts shell/PowerShell ;
-* fichiers de tests ;
-* exemples de configuration ;
-* anciens fichiers encore versionnés ;
-* fichiers générés contenant éventuellement des informations sensibles.
-
-Si certains fichiers binaires ou générés ne sont pas pertinents, indique-les simplement comme exclus.
+Tu dois détecter toi-même tous les autres fichiers.
 
 ---
 
-# 2. COMMENCER PAR IDENTIFIER L'ARCHITECTURE
+# 2. FICHIERS À ANALYSER
 
-Avant de chercher les vulnérabilités, détermine précisément :
+Analyse tous les fichiers pertinents, notamment :
 
-* version de .NET / .NET Framework utilisée ;
+* `.cs`
+* `.csproj`
+* `.sln`
+* `.config`
+* `.json`
+* `.xml`
+* `.sql`
+* `.yml`
+* `.yaml`
+* `Dockerfile`
+* `docker-compose*`
+* `.env`
+* `.props`
+* `.targets`
+* `.ps1`
+* `.bat`
+* `.cmd`
+* `.sh`
+* `.sarif`
+* `.suo`
+* scripts de déploiement ;
+* fichiers de configuration ;
+* fichiers CI/CD ;
+* tests ;
+* fichiers d'exemples ;
+* fichiers legacy ;
+* fichiers générés contenant potentiellement des données sensibles.
+
+Inspecte également les fichiers cachés pertinents.
+
+Les fichiers binaires sans intérêt pour l'audit peuvent être exclus, mais leur exclusion doit être mentionnée dans le rapport.
+
+---
+
+# 3. MÉTHODE D'AUDIT
+
+Effectue l'analyse dans cet ordre :
+
+1. inventaire du repository ;
+2. identification de l'architecture ;
+3. identification des technologies ;
+4. identification des services exposés ;
+5. cartographie de la surface d'attaque ;
+6. identification des sources de données externes ;
+7. identification des sinks sensibles ;
+8. suivi des flux de données ;
+9. recherche des vulnérabilités ;
+10. validation des findings ;
+11. classification des risques ;
+12. génération de `SECURITY_AUDIT.md`.
+
+---
+
+# 4. IDENTIFIER L'ARCHITECTURE
+
+Détermine précisément :
+
+* version .NET ;
+* version .NET Framework ;
 * TargetFramework ;
-* type d'application ;
-* WCF éventuel ;
-* SOAP ;
-* services exposés ;
+* type de projet ;
+* présence de WCF ;
+* présence de SOAP ;
+* services Windows éventuels ;
+* API ;
 * endpoints ;
-* protocoles utilisés ;
-* ports utilisés ;
-* communication avec des systèmes externes ;
-* bases de données utilisées ;
+* bindings ;
+* protocoles ;
+* ports ;
+* communications réseau ;
+* communications interservices ;
+* base de données ;
+* SQL Server ;
+* technologies externes ;
 * bibliothèques principales ;
-* mode d'authentification ;
-* gestion des autorisations ;
-* configuration Docker ;
-* mécanismes de logs ;
+* mécanisme d'authentification ;
+* mécanisme d'autorisation ;
+* Docker ;
+* journalisation ;
 * gestion des secrets ;
-* configuration réseau ;
-* dépendances externes.
+* stockage de configuration.
 
-Construis ensuite une représentation simplifiée :
+Dans `SECURITY_AUDIT.md`, crée une architecture simplifiée, par exemple :
 
 ```text
-Client
-  ↓
-Service / API / SOAP / WCF
-  ↓
+Client / système appelant
+          |
+          v
+Service WCF / SOAP
+          |
+          v
 Couche métier
-  ↓
-Accès BDD
-  ↓
-SQL Server / système externe
+          |
+          v
+Accès aux données
+          |
+          v
+SQL Server
 ```
 
-Adapte ce schéma à ce que tu trouves réellement.
+Adapte ce diagramme à l'architecture réellement trouvée.
 
 ---
 
-# 3. CARTOGRAPHIER LA SURFACE D'ATTAQUE
+# 5. CARTOGRAPHIER LA SURFACE D'ATTAQUE
 
-Identifie tout ce qui pourrait être attaqué pendant un pentest.
+Identifie tout ce qui pourrait être testé lors d'un pentest :
 
-Liste notamment :
-
-* endpoints HTTP/HTTPS ;
-* endpoints SOAP ;
-* endpoints WCF ;
+* endpoints HTTP ;
+* HTTPS ;
+* SOAP ;
+* WCF ;
+* WSDL ;
 * méthodes publiques ;
-* services accessibles ;
+* opérations de service ;
 * ports ;
 * interfaces réseau ;
 * routes ;
 * paramètres ;
-* fichiers accessibles ;
-* méthodes prenant des données utilisateurs ;
-* requêtes SQL ;
-* appels réseau ;
-* SOAP clients ;
-* fichiers lus ou écrits ;
-* commandes système ;
-* sérialisation/désérialisation ;
-* upload/download éventuels ;
-* appels vers des systèmes internes ;
-* appels vers des URL dynamiques ;
-* mécanismes d'administration ;
+* fichiers ;
+* entrées XML ;
+* entrées JSON ;
+* query strings ;
+* headers ;
 * authentification ;
-* identifiants techniques.
+* fichiers importés ;
+* fichiers exportés ;
+* requêtes SQL ;
+* procédures stockées ;
+* appels vers systèmes externes ;
+* clients SOAP ;
+* appels HTTP ;
+* accès fichiers ;
+* sérialisation ;
+* désérialisation ;
+* mécanismes d'administration.
 
-Pour chaque point d'entrée, précise :
+Pour chaque surface significative indique :
 
 * fichier ;
 * classe ;
 * méthode ;
-* données reçues ;
-* validation appliquée ;
-* destination des données ;
+* donnée reçue ;
+* validation ;
+* destination de la donnée ;
+* authentification ;
+* autorisation ;
 * risque potentiel.
 
 ---
 
-# 4. RECHERCHE DE SECRETS
+# 6. RECHERCHE DE SECRETS
 
-Recherche notamment :
+Recherche dans tout le repository :
 
 * mots de passe ;
+* identifiants ;
 * chaînes de connexion ;
 * login SQL ;
+* mots de passe SQL ;
 * clés API ;
 * tokens ;
 * JWT secrets ;
@@ -192,273 +298,342 @@ Recherche notamment :
 * credentials SOAP ;
 * comptes techniques ;
 * credentials Docker ;
-* secrets stockés dans `appsettings.json` ;
-* secrets hardcodés dans `.cs` ;
-* secrets présents dans les scripts SQL ;
-* URLs contenant des credentials ;
-* headers Authorization codés en dur.
+* secrets dans `appsettings.json` ;
+* secrets hardcodés ;
+* secrets dans SQL ;
+* secrets dans scripts ;
+* URLs avec credentials ;
+* headers Authorization hardcodés.
 
-Recherche des motifs comme :
+Recherche notamment les chaînes :
 
 ```text
 password
+Password
 pwd
 passwd
 secret
+Secret
 token
+Token
 apikey
 api_key
 Authorization
 Bearer
 connectionString
+ConnectionString
 User ID
 UID
-Password=
 Server=
 Data Source=
 ClientSecret
 PrivateKey
+AccessKey
+SecretKey
 ```
 
-Pour chaque secret potentiel :
+Pour chaque secret potentiel indique :
 
 * fichier ;
 * ligne ;
+* type de secret ;
 * valeur masquée ;
-* niveau de criticité ;
-* conséquence en cas de fuite ;
+* criticité ;
+* possibilité d'exploitation ;
 * recommandation.
 
-**Ne reproduis jamais intégralement un secret dans le rapport.**
+## IMPORTANT
+
+**Ne copie jamais intégralement un secret réel dans SECURITY_AUDIT.md.**
 
 Exemple :
 
 ```text
-Password = "P@ss********"
+Password détecté : P@ss************
 ```
+
+et non la valeur complète.
 
 ---
 
-# 5. INJECTIONS SQL
+# 7. INJECTIONS SQL
 
-Analyse minutieusement :
+Analyse particulièrement :
 
-* `Database.cs`
-* `metierTrace.cs`
-* tous les repositories ;
-* tous les appels SQL ;
-* `Base_TracePriv.sql`
-* procédures stockées ;
-* fonctions ;
-* requêtes dynamiques.
+```text
+Database.cs
+metierTrace.cs
+Base_TracePriv.sql
+```
 
-Recherche :
+mais également tous les autres fichiers.
+
+Recherche notamment :
 
 ```csharp
 "SELECT ... " + variable
 $"SELECT ... {variable}"
 string.Format(...)
+SqlCommand
 CommandText
 ExecuteSqlRaw
-SqlCommand
+ExecuteReader
+ExecuteScalar
+ExecuteNonQuery
 ```
 
-Détermine si chaque donnée dynamique est correctement paramétrée.
-
-Recherche :
+Vérifie :
 
 * SQL Injection ;
 * second-order SQL injection ;
-* ORDER BY dynamique ;
-* noms de tables dynamiques ;
+* concaténation SQL ;
+* paramètres SQL ;
+* procédures stockées ;
+* SQL dynamique ;
+* `ORDER BY` dynamique ;
 * noms de colonnes dynamiques ;
-* LIKE mal sécurisé ;
-* procédures appelées avec paramètres concaténés.
+* noms de tables dynamiques ;
+* `LIKE` dynamique ;
+* filtres construits à partir d'entrées externes.
 
-Pour chaque problème donne un exemple du flux :
+Pour chaque injection potentielle, suis réellement le flux :
 
 ```text
-Entrée utilisateur
-→ méthode X
-→ variable Y
-→ construction SQL
-→ SqlCommand
-→ SQL Server
+Entrée externe
+    ↓
+méthode X
+    ↓
+variable Y
+    ↓
+construction de requête
+    ↓
+SqlCommand
+    ↓
+SQL Server
 ```
+
+Ne signale une SQL Injection comme confirmée que si le flux est réellement vulnérable.
 
 ---
 
-# 6. WCF / SOAP
+# 8. SÉCURITÉ WCF / SOAP
 
-Puisque le projet semble contenir :
+Le repository semble notamment contenir :
 
 ```text
 ServiceTrace.svc.cs
 ServiceTraceSoapClient.cs
 ```
 
-réalise une revue approfondie de sécurité WCF/SOAP.
+Effectue une revue approfondie de WCF/SOAP.
+
+Recherche :
+
+* service accessible anonymement ;
+* opération accessible anonymement ;
+* authentification absente ;
+* autorisation absente ;
+* méthodes excessivement exposées ;
+* WSDL exposé ;
+* metadata HTTP ;
+* bindings faibles ;
+* HTTP sans HTTPS ;
+* BasicHttpBinding non sécurisé ;
+* `security mode="None"` ;
+* credentials en clair ;
+* sécurité transport absente ;
+* sécurité message absente ;
+* informations sensibles dans FaultException ;
+* stack trace SOAP ;
+* détails techniques dans les erreurs ;
+* méthodes administratives exposées ;
+* SOAP Action non contrôlée.
 
 Recherche notamment :
 
-* endpoints accessibles anonymement ;
-* authentification absente ;
-* autorisation absente ;
-* opérations trop permissives ;
-* métadonnées WSDL exposées ;
-* `serviceMetadata httpGetEnabled="true"` ;
-* bindings non sécurisés ;
-* HTTP au lieu de HTTPS ;
-* TLS insuffisant ;
-* BasicHttpBinding mal configuré ;
-* absence de sécurité transport/message ;
-* credentials transmis en clair ;
-* protection insuffisante des messages ;
-* actions SOAP non restreintes ;
-* XML externe ;
-* DTD ;
-* XXE ;
-* XML Bomb / Billion Laughs ;
-* désérialisation dangereuse ;
-* objets trop volumineux ;
-* quotas WCF trop élevés ;
-* `MaxReceivedMessageSize` dangereux ;
-* `ReaderQuotas` trop permissifs ;
-* timeout excessif ;
-* informations sensibles dans FaultException ;
-* stack traces retournées au client ;
-* erreurs SOAP trop détaillées.
+```text
+serviceMetadata
+httpGetEnabled
+includeExceptionDetailInFaults
+basicHttpBinding
+wsHttpBinding
+security mode
+transport
+message
+clientCredentialType
+```
 
-Vérifie particulièrement :
+---
+
+# 9. TAILLES ET QUOTAS DE SÉCURITÉ WCF
+
+Ce point est particulièrement important.
+
+Recherche et analyse toutes les valeurs telles que :
 
 ```text
 maxReceivedMessageSize
 maxBufferSize
+maxBufferPoolSize
 maxDepth
 maxStringContentLength
 maxArrayLength
 maxBytesPerRead
+maxNameTableCharCount
 readerQuotas
 receiveTimeout
 sendTimeout
 openTimeout
 closeTimeout
+maxItemsInObjectGraph
 ```
 
-Signale les risques de DoS associés.
+Pour chacune indique :
+
+* valeur actuelle ;
+* emplacement ;
+* usage ;
+* risque ;
+* possibilité de DoS ;
+* caractère raisonnable ou excessif ;
+* recommandation.
+
+Exemple attendu :
+
+```markdown
+### SEC-XXX — maxReceivedMessageSize excessif
+
+**Fichier :** ...
+**Ligne :** ...
+**Valeur :** 2147483647
+
+La limite autorise des messages extrêmement volumineux et augmente le risque
+d'épuisement mémoire / déni de service.
+
+**Sévérité :** ...
+```
 
 ---
 
-# 7. SSRF
-
-Analyse tous les appels réseau.
-
-Particulièrement :
-
-```text
-ServiceTraceSoapClient.cs
-HttpClient
-WebClient
-HttpWebRequest
-WebRequest
-SOAP
-URI
-URL
-EndpointAddress
-```
-
-Recherche si un utilisateur peut contrôler :
-
-* hostname ;
-* URL ;
-* port ;
-* protocole ;
-* chemin ;
-* paramètres réseau.
-
-Identifier les risques :
-
-* SSRF ;
-* accès localhost ;
-* accès réseau interne ;
-* accès metadata cloud ;
-* contournement firewall ;
-* DNS rebinding ;
-* URL avec schéma dangereux.
-
----
-
-# 8. XML / XXE
+# 10. XML / XXE
 
 Recherche :
 
 ```csharp
 XmlDocument
 XmlReader
+XmlTextReader
 XDocument
 XmlSerializer
 DataSet.ReadXml
 XPathDocument
+XmlResolver
+DtdProcessing
 ```
 
 Vérifie :
 
-* DTD activées ;
-* résolution d'entités externes ;
-* `XmlResolver` ;
-* limites de taille ;
+* entités externes ;
+* DTD ;
+* XXE ;
+* Billion Laughs ;
+* XML Bomb ;
+* récupération de ressources externes ;
+* lecture de fichiers locaux ;
+* SSRF via XML ;
 * profondeur XML ;
-* parsing de fichiers non fiables.
+* limites insuffisantes.
 
-Classe XXE en priorité haute/critique si exploitable depuis une entrée distante.
+XXE doit être classé haute ou critique si une entrée distante permet son exploitation.
 
 ---
 
-# 9. DÉSÉRIALISATION
+# 11. SSRF
 
-Recherche notamment :
+Analyse :
+
+```csharp
+HttpClient
+WebClient
+HttpWebRequest
+WebRequest
+EndpointAddress
+Uri
+URL
+SOAP Client
+```
+
+Détermine si une entrée externe peut contrôler :
+
+* protocole ;
+* hostname ;
+* IP ;
+* URL ;
+* port ;
+* chemin.
+
+Recherche :
+
+* localhost ;
+* 127.0.0.1 ;
+* réseaux privés ;
+* services internes ;
+* metadata cloud ;
+* DNS rebinding ;
+* redirections ;
+* protocoles non prévus.
+
+---
+
+# 12. DÉSÉRIALISATION
+
+Recherche :
 
 ```text
 BinaryFormatter
+SoapFormatter
 NetDataContractSerializer
 LosFormatter
 ObjectStateFormatter
-SoapFormatter
 JavaScriptSerializer
 TypeNameHandling
 DataContractSerializer
 XmlSerializer
 ```
 
-Vérifie si des données contrôlées par un utilisateur peuvent être désérialisées.
+Détermine si des données non fiables peuvent être désérialisées.
 
-Identifier les possibilités :
+Recherche les risques :
 
-* Remote Code Execution ;
-* instanciation de types arbitraires ;
-* gadget chains ;
-* modification de propriétés sensibles.
+* RCE ;
+* gadget chain ;
+* instanciation arbitraire ;
+* modification d'état ;
+* DoS.
 
 ---
 
-# 10. COMMAND INJECTION
+# 13. COMMAND INJECTION
 
 Recherche :
 
 ```csharp
 Process.Start
+ProcessStartInfo
 cmd.exe
+powershell.exe
 powershell
 bash
-ProcessStartInfo
 ShellExecute
 ```
 
-Vérifie toute concaténation de données externes dans une commande.
+Analyse les arguments transmis.
+
+Signale toute donnée externe concaténée dans une commande système.
 
 ---
 
-# 11. PATH TRAVERSAL / FICHIERS
+# 14. PATH TRAVERSAL / SÉCURITÉ FICHIERS
 
 Recherche :
 
@@ -466,6 +641,8 @@ Recherche :
 File.ReadAllText
 File.WriteAllText
 File.Open
+File.Delete
+File.Copy
 Directory
 Path.Combine
 StreamReader
@@ -473,155 +650,151 @@ StreamWriter
 FileStream
 ```
 
-Vérifie si des données utilisateur peuvent produire :
+Vérifie :
 
-```text
-../
-..\
-chemin absolu
-UNC path
-```
-
-Recherche également :
-
-* accès arbitraire à des fichiers ;
-* overwrite ;
+* `../`
+* `..\`
+* chemins absolus ;
+* UNC ;
+* écriture arbitraire ;
+* lecture arbitraire ;
 * suppression arbitraire ;
+* écrasement de fichiers ;
 * ZIP Slip ;
-* fichiers temporaires non sécurisés.
+* fichiers temporaires.
 
 ---
 
-# 12. AUTHENTIFICATION
+# 15. AUTHENTIFICATION
 
-Détermine comment les utilisateurs/services sont authentifiés.
+Détermine précisément le mécanisme utilisé.
 
 Recherche :
 
-* aucune authentification ;
-* authentification maison ;
-* mot de passe en clair ;
-* comparaison de mot de passe ;
-* Basic Auth ;
+* authentification absente ;
+* Windows Authentication ;
+* Basic Authentication ;
 * JWT ;
-* cookie ;
-* API key ;
+* cookies ;
+* API Key ;
 * certificat ;
 * Active Directory ;
-* Windows Authentication.
+* authentification custom ;
+* credentials techniques.
 
 Vérifie :
 
 * brute-force ;
 * absence de rate limiting ;
+* mots de passe en clair ;
+* comptes partagés ;
 * credentials statiques ;
-* session fixation ;
-* durée excessive des sessions ;
-* tokens réutilisables ;
-* absence de révocation ;
-* logout incorrect ;
-* mots de passe loggés.
+* sessions trop longues ;
+* jetons non expirants ;
+* tokens non révoqués.
 
 ---
 
-# 13. AUTORISATION
+# 16. AUTORISATION
 
-Pour chaque endpoint/méthode exposée, détermine :
+Pour chaque opération exposée, déterminer :
 
-> Un utilisateur authentifié est-il réellement autorisé à effectuer cette opération ?
+> Le fait d'être authentifié suffit-il à effectuer cette opération ?
 
 Recherche :
 
+* Broken Access Control ;
 * IDOR ;
 * BOLA ;
-* Broken Access Control ;
+* absence de contrôle de droits ;
+* absence de contrôle de rôle ;
 * élévation horizontale ;
 * élévation verticale ;
-* méthodes administratives accessibles ;
-* absence de contrôle de rôle ;
-* contrôle uniquement effectué côté client.
+* fonctions administratives accessibles.
 
 ---
 
-# 14. VALIDATION DES ENTRÉES
+# 17. VALIDATION DES ENTRÉES
 
-Cartographie toutes les données venant de l'extérieur :
+Identifie toutes les sources externes :
 
 ```text
 HTTP
 SOAP
-BDD
-fichier
 XML
 JSON
+BDD
+fichier
+query string
 header
-query
-body
 configuration
 variables d'environnement
+service externe
 ```
 
 Vérifie :
 
-* validation ;
-* longueur maximale ;
-* format ;
 * type ;
-* plage ;
-* caractères autorisés ;
+* taille ;
+* longueur ;
+* intervalle ;
+* format ;
 * encodage ;
-* canonicalisation.
+* caractères ;
+* valeurs nulles ;
+* canonicalisation ;
+* limites.
 
 ---
 
-# 15. XSS / HTML
+# 18. XSS / HTML INJECTION
 
-Si l'application génère du HTML ou retourne des données affichées ailleurs, recherche :
+Si des données sont affichées sous forme HTML, directement ou via un autre composant, recherche :
 
 * Stored XSS ;
 * Reflected XSS ;
-* DOM XSS ;
-* HTML injection.
+* HTML Injection.
 
-Identifier les données stockées en BDD qui pourraient ensuite être affichées dans une autre application.
+Prends également en compte les données stockées en base puis réaffichées dans une autre interface.
 
 ---
 
-# 16. LOGS
+# 19. LOGGING
 
-Analyse tous les logs.
+Analyse tous les mécanismes de logs.
 
-Cherche si sont journalisés :
+Recherche si les logs contiennent :
 
 * mots de passe ;
 * tokens ;
 * cookies ;
-* Authorization headers ;
+* Authorization ;
+* credentials ;
+* chaînes de connexion ;
 * données personnelles ;
 * requêtes SQL ;
-* chaînes de connexion ;
+* XML SOAP complet ;
 * données métier sensibles ;
-* exceptions complètes ;
-* traces SOAP complètes.
+* exceptions complètes.
 
-Recherche également le risque :
+Recherche également :
 
-### Log Injection
+## Log Injection
 
-Une donnée utilisateur contenant :
+Une donnée externe contenant :
 
 ```text
-\n
 \r
+\n
 ```
 
-peut-elle falsifier les logs ?
+peut-elle produire de fausses entrées de journal ?
 
 ---
 
-# 17. GESTION DES ERREURS
+# 20. GESTION DES ERREURS
 
-Cherche :
+Recherche :
 
 ```csharp
 catch (Exception ex)
@@ -629,21 +802,30 @@ throw ex
 ex.ToString()
 StackTrace
 InnerException
+Message
 ```
 
-Vérifie si un utilisateur distant peut obtenir :
+Vérifie si les utilisateurs peuvent récupérer :
 
-* stack trace ;
+* stack traces ;
 * chemins locaux ;
 * noms de serveurs ;
-* noms de tables ;
-* requêtes SQL ;
-* chaînes de connexion ;
-* versions des composants.
+* noms de bases ;
+* tables ;
+* SQL ;
+* credentials ;
+* versions ;
+* informations internes.
+
+Recherche particulièrement :
+
+```text
+includeExceptionDetailInFaults
+```
 
 ---
 
-# 18. CRYPTOGRAPHIE
+# 21. CRYPTOGRAPHIE
 
 Recherche :
 
@@ -654,56 +836,60 @@ DES
 TripleDES
 RC2
 ECB
-Random
-System.Random
 Rijndael
+System.Random
+Random
 ```
 
 Vérifie :
 
-* algorithmes obsolètes ;
+* hash obsolète ;
+* chiffrement obsolète ;
 * IV fixe ;
-* clés hardcodées ;
-* clés trop courtes ;
-* mauvais générateur aléatoire ;
+* clé fixe ;
+* clé hardcodée ;
 * absence de salt ;
-* chiffrement réversible de mots de passe.
+* mauvais générateur aléatoire ;
+* chiffrement maison.
 
 ---
 
-# 19. TLS / HTTPS
-
-Analyse les configurations réseau.
+# 22. TLS / CERTIFICATS
 
 Recherche :
 
-* HTTP ;
-* TLS 1.0 ;
-* TLS 1.1 ;
-* désactivation de validation certificat ;
-* callback retournant toujours `true`.
-
-Recherche par exemple :
-
-```csharp
+```text
 ServerCertificateValidationCallback
-return true
 RemoteCertificateValidationCallback
 SslProtocols
 SecurityProtocol
+ServicePointManager
+CertificateValidation
 ```
 
-Signaler en **CRITIQUE** tout code du type :
+Toute logique ressemblant à :
 
 ```csharp
 (sender, certificate, chain, errors) => true
 ```
 
+doit être analysée immédiatement.
+
+Une validation de certificat systématiquement désactivée doit généralement être considérée comme **HAUTE ou CRITIQUE selon son exposition**.
+
+Recherche également :
+
+* TLS 1.0 ;
+* TLS 1.1 ;
+* SSL ;
+* certificats non vérifiés ;
+* HTTP en clair.
+
 ---
 
-# 20. CORS
+# 23. CORS
 
-Si applicable, rechercher :
+Si applicable, recherche :
 
 ```text
 AllowAnyOrigin
@@ -712,13 +898,17 @@ AllowAnyMethod
 *
 ```
 
-et vérifier le risque avec les credentials.
+Vérifie également la combinaison :
+
+```text
+AllowAnyOrigin + credentials
+```
 
 ---
 
-# 21. CSRF
+# 24. CSRF
 
-Pour les opérations state-changing accessibles via navigateur :
+Si des opérations peuvent être invoquées depuis un navigateur, analyse :
 
 ```text
 POST
@@ -727,139 +917,147 @@ PATCH
 DELETE
 ```
 
-vérifier les protections CSRF.
+et les protections CSRF.
 
 ---
 
-# 22. MASS ASSIGNMENT / OVERPOSTING
+# 25. MASS ASSIGNMENT
 
-Vérifier si des objets métiers complets sont directement désérialisés depuis les requêtes.
+Vérifie si les données reçues permettent directement de remplir des objets métier sensibles.
 
-Chercher la possibilité de modifier :
+Recherche particulièrement des champs comme :
 
 ```text
 IsAdmin
 Role
 Status
-OwnerId
 UserId
-CreatedBy
+OwnerId
 Validated
 Enabled
+CreatedBy
 ```
-
-ou d'autres champs sensibles.
 
 ---
 
-# 23. INTEGER OVERFLOW / LIMITES
+# 26. LIMITES NUMÉRIQUES ET MÉMOIRE
 
 Recherche :
 
-* tailles non limitées ;
-* conversions numériques dangereuses ;
-* dépassements ;
-* index négatifs ;
-* allocations contrôlables ;
-* grandes boucles contrôlées par utilisateur.
+* integer overflow ;
+* conversions non contrôlées ;
+* allocations importantes ;
+* tailles utilisateur ;
+* tableaux dimensionnés par une entrée externe ;
+* boucles basées sur une valeur externe.
 
 ---
 
-# 24. DENIAL OF SERVICE
+# 27. DENIAL OF SERVICE
 
-Identifier notamment :
+Recherche :
 
-* requêtes non limitées ;
-* absence de pagination ;
-* recherches SQL coûteuses ;
-* regex catastrophiques ;
+* absence de limite de payload ;
+* grosses requêtes SOAP ;
 * XML bomb ;
-* payload énorme ;
-* recursion ;
-* boucles sur données externes ;
-* allocation mémoire massive ;
+* regex catastrophiques ;
+* absence de pagination ;
+* requêtes SQL non bornées ;
+* boucles coûteuses ;
+* allocation mémoire contrôlée ;
+* timeout excessif ;
+* appels synchrones bloquants ;
 * endpoints sans rate limiting ;
-* opérations synchrones bloquantes ;
-* connexions BDD non libérées ;
-* connexions HTTP non libérées.
+* connexions non libérées.
+
+Inspecte particulièrement les tailles WCF/SOAP.
 
 ---
 
-# 25. CONCURRENCE
+# 28. CONCURRENCE
 
 Recherche :
 
 * race conditions ;
 * TOCTOU ;
-* ressources partagées ;
+* variable `static` mutable ;
 * singleton non thread-safe ;
-* variables `static` modifiables ;
-* double validation ;
-* absence de transaction.
+* double traitement ;
+* double écriture ;
+* manque de transaction ;
+* contrôle puis modification séparés.
 
 ---
 
-# 26. BASE SQL
+# 29. SQL SERVER
 
-Analyse intégralement :
+Analyse entièrement :
 
 ```text
 SQL/Base_TracePriv.sql
 ```
 
-Cherche :
+ainsi que tous les scripts SQL.
 
-* mots de passe ;
+Recherche :
+
 * comptes SQL ;
-* utilisateurs privilégiés ;
+* passwords ;
 * `sa` ;
-* permissions excessives ;
-* GRANT dangereux ;
-* EXECUTE ;
+* GRANT ;
 * db_owner ;
-* procédures dangereuses ;
-* xp_cmdshell ;
-* SQL dynamique ;
-* données sensibles ;
 * permissions `PUBLIC` ;
-* fonctions risquées.
+* EXECUTE ;
+* SQL dynamique ;
+* procédures à risque ;
+* fonctions sensibles ;
+* `xp_cmdshell` ;
+* données sensibles ;
+* permissions excessives.
 
-Vérifie également si les droits appliquent le principe du **moindre privilège**.
+Évalue le respect du principe du moindre privilège.
 
 ---
 
-# 27. DOCKER
+# 30. DOCKER
 
-Analyse tout :
+Analyse tout le dossier :
 
 ```text
 docker/
+```
+
+ainsi que :
+
+```text
 Dockerfile
-docker-compose*
+docker-compose.yml
+docker-compose.yaml
+docker-compose.*
 ```
 
 Recherche :
 
-* conteneur lancé en root ;
-* secrets dans ENV ;
-* secrets dans build args ;
+* root ;
+* image vulnérable ;
+* image obsolète ;
+* tag `latest` ;
+* secret dans `ENV` ;
+* secret dans `ARG` ;
 * `.env` embarqué ;
-* ports inutiles exposés ;
-* volumes dangereux ;
-* host filesystem monté ;
-* Docker socket ;
+* port inutile ;
+* volume dangereux ;
+* docker socket ;
 * `privileged: true` ;
 * `network_mode: host` ;
 * capacités Linux inutiles ;
-* images anciennes ;
-* tag `latest` ;
-* absence de healthcheck ;
-* absence de user non-root ;
-* permissions trop larges.
+* absence de non-root user ;
+* permissions dangereuses ;
+* healthcheck absent.
 
 ---
 
-# 28. DÉPENDANCES
+# 31. DÉPENDANCES
 
 Analyse :
 
@@ -870,59 +1068,66 @@ PackageReference
 NuGet
 ```
 
-Liste toutes les dépendances et leurs versions.
+Liste les dépendances et versions détectées.
 
-Identifie celles :
+Pour chaque dépendance potentiellement problématique indique :
 
-* obsolètes ;
-* non maintenues ;
-* connues pour avoir eu des CVE ;
-* particulièrement anciennes ;
-* incompatibles avec des versions supportées.
+| Package | Version | État | Risque | Action |
+| ------- | ------- | ---- | ------ | ------ |
 
-Ne prétends pas qu'une CVE précise existe si tu ne peux pas le confirmer.
+Ne fabrique jamais de CVE.
 
-Dans ce cas écris :
+Si tu ne peux pas confirmer une CVE :
 
-> "Version à vérifier contre la base CVE/NVD/GitHub Advisory."
+```text
+À vérifier contre GitHub Advisory / NVD / NuGet Advisory.
+```
 
 ---
 
-# 29. FRAMEWORK OBSOLÈTE
+# 32. FRAMEWORKS OBSOLÈTES
 
-Vérifie la version réelle du runtime/framework.
+Détermine la version exacte utilisée.
 
 Indique :
 
-* si elle est encore supportée ;
-* risques liés à la version ;
-* dépendances legacy ;
+* supportée ou non ;
+* fin de support éventuelle ;
+* technologie legacy ;
+* conséquence sécurité ;
+* difficulté de maintenance ;
+* recommandation.
+
+Vérifie particulièrement :
+
+* .NET Framework ancien ;
 * WCF legacy ;
-* ASP.NET legacy éventuel.
+* bibliothèques Microsoft anciennes ;
+* NuGet ancien.
 
 ---
 
-# 30. FICHIERS QUI NE DEVRAIENT PAS ÊTRE VERSIONNÉS
+# 33. FICHIERS SENSIBLES VERSIONNÉS
 
-Recherche :
+Recherche notamment :
 
 ```text
 .suo
 .user
 .env
-pfx
-p12
-key
-pem
-log
-bak
-backup
-dump
-sql
-sarif
+.pfx
+.p12
+.pem
+.key
+.log
+.bak
+.backup
+.dump
+.sql
+.sarif
 ```
 
-Dans l'arborescence visible, il existe notamment :
+Dans le repository semblent notamment exister :
 
 ```text
 ServiceTracePriv.suo
@@ -930,18 +1135,21 @@ ServiceTracePriv.V12.suo
 AnalysisReport.sarif
 ```
 
-Détermine s'ils contiennent :
+Analyse leur pertinence.
 
-* chemins locaux ;
-* informations utilisateurs ;
+Vérifie s'ils révèlent :
+
+* username local ;
+* chemin Windows ;
+* infrastructure ;
+* hostname ;
 * secrets ;
-* données d'environnement ;
-* vulnérabilités historiques ;
-* informations internes.
+* données de debugging ;
+* findings sécurité historiques.
 
 ---
 
-# 31. ANALYSISREPORT.SARIF
+# 34. ANALYSISREPORT.SARIF
 
 Analyse :
 
@@ -949,44 +1157,66 @@ Analyse :
 AnalysisReport.sarif
 ```
 
-Mais ne considère pas automatiquement son contenu comme toujours valide.
+Mais ne copie pas automatiquement ses findings.
 
-Pour chaque finding SARIF :
+Pour chacun :
 
 1. retrouve le code concerné ;
-2. vérifie si la vulnérabilité existe toujours ;
-3. confirme ou infirme le finding ;
-4. inclue uniquement les findings encore pertinents dans le rapport final.
+2. vérifie s'il existe toujours ;
+3. analyse le flux ;
+4. confirme ou infirme ;
+5. classe le résultat.
+
+Utilise :
+
+```text
+CONFIRMÉ
+PROBABLE
+À VÉRIFIER DYNAMIQUEMENT
+FAUX POSITIF
+CORRIGÉ / PLUS PRÉSENT
+```
 
 ---
 
-# 32. TESTS
+# 35. TESTS
 
-Analyse également le dossier :
+Analyse :
 
 ```text
 tests/
 ```
 
-Détermine si des tests de sécurité existent.
+Détermine les tests de sécurité existants et manquants.
 
-Recherche les tests manquants concernant :
+Recherche notamment des tests portant sur :
 
 * authentification ;
 * autorisation ;
-* injection SQL ;
+* injections ;
 * XML ;
 * XXE ;
-* erreurs ;
+* taille payload ;
+* WCF ;
+* SOAP ;
+* SQL ;
 * validation ;
-* données volumineuses ;
+* exceptions ;
 * permissions.
 
 ---
 
-# 33. OWASP TOP 10
+# 36. OWASP TOP 10
 
-À la fin, fais explicitement une correspondance avec OWASP Top 10 :
+Créer dans `SECURITY_AUDIT.md` une matrice OWASP Top 10.
+
+Pour chaque catégorie :
+
+```text
+Concerné : OUI / NON / À CONFIRMER
+```
+
+Inclure au minimum :
 
 * Broken Access Control
 * Cryptographic Failures
@@ -999,59 +1229,53 @@ Recherche les tests manquants concernant :
 * Security Logging and Monitoring Failures
 * SSRF
 
-Indique pour chaque catégorie :
-
-```text
-Concerné : OUI / NON / À CONFIRMER
-```
-
-avec justification.
-
 ---
 
-# 34. CWE
+# 37. CWE
 
-Pour chaque vulnérabilité confirmée, indique si possible son CWE.
+Pour chaque vulnérabilité confirmée ou probable, associe le CWE pertinent si possible.
 
 Exemples :
 
 ```text
-CWE-89  SQL Injection
-CWE-22  Path Traversal
-CWE-79  XSS
-CWE-78  OS Command Injection
-CWE-798 Hard-coded Credentials
-CWE-918 SSRF
-CWE-611 XXE
-CWE-502 Unsafe Deserialization
-CWE-287 Improper Authentication
-CWE-862 Missing Authorization
+CWE-89   SQL Injection
+CWE-22   Path Traversal
+CWE-79   XSS
+CWE-78   OS Command Injection
+CWE-798  Hard-coded Credentials
+CWE-918  SSRF
+CWE-611  XXE
+CWE-502  Unsafe Deserialization
+CWE-287  Improper Authentication
+CWE-862  Missing Authorization
+CWE-209  Information Exposure Through Error Message
+CWE-295  Improper Certificate Validation
 ```
 
 ---
 
-# 35. CVSS
+# 38. CVSS
 
-Attribue une estimation CVSS aux vulnérabilités confirmées lorsque cela a du sens.
-
-Utilise :
+Attribue une estimation CVSS lorsque suffisamment d'informations sont présentes :
 
 ```text
-9.0–10.0 CRITIQUE
-7.0–8.9  HAUTE
-4.0–6.9  MOYENNE
-0.1–3.9  FAIBLE
+9.0 – 10.0 : CRITIQUE
+7.0 – 8.9  : HAUTE
+4.0 – 6.9  : MOYENNE
+0.1 – 3.9  : FAIBLE
 ```
 
-Si les informations sont insuffisantes :
+Si l'exploitation dépend du déploiement :
 
 ```text
-CVSS : À confirmer dynamiquement
+CVSS : À confirmer après test dynamique
 ```
+
+Ne donne pas une fausse précision.
 
 ---
 
-# 36. EXPLOITABILITÉ
+# 39. EXPLOITABILITÉ
 
 Pour chaque vulnérabilité indique :
 
@@ -1067,310 +1291,443 @@ Impact disponibilité : ...
 
 ---
 
-# 37. CHAÎNES D'ATTAQUE
+# 40. CHAÎNES D'ATTAQUE
 
-Ne te limite pas aux vulnérabilités individuelles.
-
-Recherche les combinaisons possibles.
+Cherche également les vulnérabilités combinables.
 
 Exemple :
 
 ```text
-Endpoint SOAP public
-        ↓
+SOAP exposé
+    ↓
 absence d'authentification
-        ↓
-entrée non validée
-        ↓
+    ↓
+entrée utilisateur non validée
+    ↓
 SQL Injection
-        ↓
-lecture BDD
-        ↓
-récupération de credentials
-        ↓
-compromission d'un service interne
+    ↓
+accès BDD
+    ↓
+récupération d'informations sensibles
+    ↓
+compromission supplémentaire
 ```
 
-Liste les chaînes réalistes trouvées.
+Ne crée que des chaînes plausibles au regard du code.
 
 ---
 
-# 38. CE QU'UN PENTESTEUR TESTERA PROBABLEMENT
+# 41. SECURITY SMELLS
 
-Fais ensuite une section :
-
-# Points qu'un pentesteur identifiera probablement rapidement
-
-Classe-les par ordre de probabilité.
-
-Par exemple :
+Recherche :
 
 ```text
-1. Endpoints exposés sans authentification
-2. Informations sensibles dans appsettings
-3. Injection SQL
-4. WSDL accessible
-5. SOAP/XML vulnérable
-6. TLS faible
-7. Framework obsolète
-8. Dépendances vulnérables
-9. Messages d'erreur trop détaillés
-10. Permissions SQL excessives
+TODO
+FIXME
+HACK
+WORKAROUND
+TEMP
+temporary
+return true
+catch { }
 ```
 
-Mais cette liste doit être basée sur le code réellement présent.
+ainsi que :
+
+* code commenté contenant d'anciens secrets ;
+* contrôles désactivés ;
+* validations contournées ;
+* ancienne configuration ;
+* mécanismes provisoires ;
+* commentaires sécurité.
 
 ---
 
-# 39. RECHERCHE DE "SECURITY SMELLS"
+# 42. ÉVITER LES FAUX POSITIFS
 
-Même lorsqu'une vulnérabilité n'est pas immédiatement exploitable, recherche :
+Tu ne dois pas présenter un simple pattern comme une vulnérabilité confirmée.
 
-* TODO sécurité ;
-* FIXME ;
-* workaround ;
-* code commenté contenant des credentials ;
-* mécanismes désactivés ;
-* validations volontairement contournées ;
-* `return true` ;
-* `catch { }` ;
-* code legacy ;
-* duplication de règles de sécurité ;
-* commentaires indiquant un contournement.
+Utilise impérativement les statuts suivants :
 
----
+## CONFIRMÉ
 
-# 40. AUCUN FAUX POSITIF
+La vulnérabilité et son flux sont démontrables dans le code.
 
-Très important :
+## PROBABLE
 
-Ne dis pas simplement :
+Le code présente clairement un risque mais une donnée de configuration manque.
 
-> "Il pourrait y avoir une SQL Injection."
+## À VÉRIFIER DYNAMIQUEMENT
 
-Je veux savoir si le code permet réellement le problème.
+Une exécution ou un pentest est nécessaire.
 
-Pour chaque finding différencie clairement :
+## FAUX POSITIF
 
-### CONFIRMÉ
+Le pattern existe mais le code dispose d'une protection suffisante.
 
-Le flux vulnérable est visible dans le code.
+## NON APPLICABLE
 
-### PROBABLE
-
-Le code est fortement suspect mais une information d'environnement manque.
-
-### À VÉRIFIER DYNAMIQUEMENT
-
-Il faut exécuter l'application pour conclure.
-
-### FAUX POSITIF / NON EXPLOITABLE
-
-Le pattern est présent mais protégé correctement.
+Le type de vulnérabilité n'est pas applicable au projet.
 
 ---
 
-# 41. PREUVES
+# 43. PREUVES OBLIGATOIRES
 
-Chaque finding doit obligatoirement avoir :
+Chaque vulnérabilité doit avoir autant que possible :
 
 ```text
 ID
 Titre
 Sévérité
-CVSS estimé
+CVSS
 CWE
 Statut
 Fichier
+Ligne(s)
 Classe
 Méthode
-Numéro de ligne
-Code concerné
-Origine de la donnée
+Source
+Sink
 Flux de données
 Condition d'exploitation
 Impact
 Correction recommandée
-Test permettant de confirmer la correction
+Test de validation
 ```
 
-Ne donne pas seulement des recommandations génériques.
+Une vulnérabilité sans emplacement précis dans le code ne doit pas être présentée comme `CONFIRMÉ`.
 
 ---
 
-# 42. FORMAT DU RAPPORT FINAL
+# 44. FORMAT OBLIGATOIRE DE SECURITY_AUDIT.md
 
-Produis exactement cette structure.
+Le fichier généré doit être propre et lisible sur GitHub.
+
+Commence par :
+
+```markdown
+# Audit de sécurité — ServiceTracePriv
+
+> Rapport généré automatiquement à partir de l'analyse statique du repository.
+>
+> Aucun correctif applicatif n'a été appliqué lors de cet audit.
+```
+
+Puis utilise exactement les sections suivantes.
+
+---
 
 ## 1. Résumé exécutif
 
 Inclure :
 
 ```text
-CRITIQUES : X
-HAUTES    : X
-MOYENNES  : X
-FAIBLES   : X
-INFO      : X
+🔴 Critiques : X
+🟠 Hautes : X
+🟡 Moyennes : X
+🔵 Faibles : X
+⚪ Informations : X
 ```
 
-Puis une appréciation :
+Puis :
 
 ```text
-Niveau de risque global :
-CRITIQUE / ÉLEVÉ / MOYEN / FAIBLE
+Niveau de risque global : CRITIQUE / ÉLEVÉ / MOYEN / FAIBLE
 ```
 
----
-
-## 2. Architecture identifiée
-
-Technologies, framework, services, BDD, Docker, communications.
+Et un résumé de 5 à 15 lignes maximum.
 
 ---
 
-## 3. Surface d'attaque
+## 2. Périmètre audité
+
+Lister :
+
+* dossiers ;
+* types de fichiers ;
+* fichiers importants ;
+* fichiers exclus et pourquoi.
+
+---
+
+## 3. Architecture identifiée
+
+Inclure technologies, framework, WCF, SOAP, SQL, Docker, communication réseau, etc.
+
+---
+
+## 4. Surface d'attaque
+
+Utiliser un tableau :
+
+| Surface | Fichier / composant | Exposition | Authentification | Risque |
+| ------- | ------------------- | ---------- | ---------------- | ------ |
+
+---
+
+## 5. Synthèse des vulnérabilités
+
+Créer un tableau :
+
+| ID | Sévérité | Statut | Vulnérabilité | Fichier | CWE | CVSS |
+| -- | -------- | ------ | ------------- | ------- | --- | ---- |
+
+Classer du plus grave au moins grave.
+
+---
+
+## 6. Vulnérabilités critiques
+
+Utiliser ce format pour chaque vulnérabilité :
+
+````markdown
+### SEC-001 — Titre
+
+**Sévérité :** Critique  
+**Statut :** CONFIRMÉ  
+**CVSS :** X.X  
+**CWE :** CWE-XXX  
+**Exploitable à distance :** Oui / Non / Possible  
+**Authentification nécessaire :** Oui / Non / Inconnu  
+
+#### Emplacement
+
+- **Fichier :** `...`
+- **Ligne(s) :** ...
+- **Classe :** ...
+- **Méthode :** ...
+
+#### Description
+
+...
+
+#### Code concerné
+
+```csharp
+...
+````
+
+#### Flux de données
+
+```text
+Entrée externe
+    ↓
+Méthode
+    ↓
+Traitement
+    ↓
+Sink vulnérable
+```
+
+#### Scénario d'exploitation
+
+...
+
+#### Impact
+
+* Confidentialité :
+* Intégrité :
+* Disponibilité :
+
+#### Correction recommandée
+
+...
+
+#### Test de validation
+
+...
+
+````
+
+Ne mets jamais de secret réel dans un extrait.
+
+---
+
+## 7. Vulnérabilités hautes
+
+Même format.
+
+---
+
+## 8. Vulnérabilités moyennes
+
+Même format.
+
+---
+
+## 9. Vulnérabilités faibles
+
+Même format.
+
+---
+
+## 10. Informations et Security Smells
+
+---
+
+## 11. Secrets et données sensibles
+
+Utiliser :
+
+| Fichier | Ligne | Type | Sévérité | Commentaire |
+|---|---:|---|---|---|
+
+Masquer les secrets.
+
+---
+
+## 12. Sécurité WCF / SOAP
+
+Inclure impérativement une sous-section :
+
+### Limites et quotas WCF
 
 Tableau :
 
-| Surface | Exposition | Authentification | Risque |
-| ------- | ---------- | ---------------- | ------ |
+| Paramètre | Valeur | Fichier | Risque | Recommandation |
+|---|---:|---|---|---|
+
+Inclure notamment :
+
+- maxReceivedMessageSize
+- maxBufferSize
+- readerQuotas
+- maxDepth
+- maxStringContentLength
+- maxArrayLength
+- timeouts
+
+lorsqu'ils existent.
 
 ---
 
-## 4. Vulnérabilités critiques
+## 13. Sécurité XML
 
-Pour chaque vulnérabilité :
+Inclure XXE, DTD, XML Bomb, XmlResolver, quotas.
+
+---
+
+## 14. Sécurité SQL Server
+
+---
+
+## 15. Authentification et autorisation
+
+---
+
+## 16. Sécurité cryptographique et TLS
+
+---
+
+## 17. Logging et gestion des erreurs
+
+---
+
+## 18. Sécurité Docker
+
+---
+
+## 19. Dépendances
+
+Tableau :
+
+| Package | Version | Statut | Risque | Recommandation |
+|---|---:|---|---|---|
+
+---
+
+## 20. Technologies obsolètes
+
+---
+
+## 21. Fichiers sensibles présents dans Git
+
+---
+
+## 22. Analyse des résultats SARIF
+
+Tableau :
+
+| Finding SARIF | État actuel | Fichier | Commentaire |
+|---|---|---|---|
+
+---
+
+## 23. Matrice OWASP Top 10
+
+Tableau :
+
+| OWASP | Concerné | Findings | Commentaire |
+|---|---|---|---|
+
+---
+
+## 24. Chaînes d'attaque potentielles
+
+---
+
+## 25. Ce qu'un pentesteur risque de remarquer rapidement
+
+Créer un classement :
 
 ```text
-SEC-001 — Nom
+1.
+2.
+3.
+...
+````
 
-Sévérité :
-CVSS :
-CWE :
-Statut :
+Limiter cette section aux **10 éléments les plus significatifs réellement détectés**.
 
-Fichier :
-Lignes :
-Classe :
-Méthode :
+---
 
-Description :
+## 26. Points à vérifier dynamiquement lors du pentest
 
-Preuve :
+Pour chaque élément :
 
-Flux :
-Entrée
-↓
-Méthode
-↓
-Traitement
-↓
-Sink
+```markdown
+### DYN-001 — Nom du test
 
-Scénario d'exploitation :
+**Objectif :**
+...
 
-Impact :
+**Composant :**
+...
 
-Correction :
+**Pourquoi le test dynamique est nécessaire :**
+...
 
-Test de validation :
+**Résultat attendu sécurisé :**
+...
 ```
 
----
-
-## 5. Vulnérabilités hautes
-
-Même format.
+Ne donne pas d'instructions destructrices.
 
 ---
 
-## 6. Vulnérabilités moyennes
-
-Même format.
+## 27. Tests de sécurité manquants
 
 ---
 
-## 7. Vulnérabilités faibles
+## 28. Plan de remédiation
 
-Même format.
+### P0 — Bloquant avant pentest / production
 
----
+Problèmes critiques ou immédiatement exploitables.
 
-## 8. Informations / Security smells
+### P1 — Important
 
----
-
-## 9. Secrets détectés
-
-Masquer les valeurs.
-
----
-
-## 10. Dépendances à risque
-
-| Package | Version | Risque | Action recommandée |
-| ------- | ------: | ------ | ------------------ |
-
----
-
-## 11. Sécurité SQL
-
----
-
-## 12. Sécurité WCF/SOAP
-
----
-
-## 13. Sécurité Docker
-
----
-
-## 14. Authentification et autorisation
-
----
-
-## 15. Cryptographie/TLS
-
----
-
-## 16. Logging et gestion des erreurs
-
----
-
-## 17. Correspondance OWASP Top 10
-
----
-
-## 18. Chaînes d'attaque possibles
-
----
-
-## 19. Top 10 des éléments qu'un pentesteur risque de remarquer
-
----
-
-## 20. Plan de remédiation
-
-Faire trois groupes :
-
-### P0 — À corriger immédiatement avant pentest
-
-Vulnérabilités critiques ou directement exploitables.
-
-### P1 — À corriger avant mise en production / audit
-
-Vulnérabilités importantes.
+Problèmes élevés à corriger rapidement.
 
 ### P2 — Durcissement
 
-Bonnes pratiques et réduction de surface d'attaque.
+Améliorations sécurité importantes mais non bloquantes.
 
 ---
 
-# 43. RÈGLE DE FIN
+## 29. Verdict final
 
-Après l'audit, donne également le verdict :
+Utiliser exactement :
 
 ```text
 PRÊT POUR PENTEST : OUI / NON
@@ -1379,38 +1736,196 @@ PRÊT POUR PENTEST : OUI / NON
 Puis :
 
 ```text
-Nombre de problèmes bloquants avant pentest : X
+Nombre de problèmes bloquants : X
 ```
 
-Et liste **uniquement les problèmes réellement bloquants**.
+Puis :
+
+### Problèmes bloquants
+
+Ne lister ici que les problèmes véritablement bloquants.
 
 ---
 
-# 44. IMPORTANT
+## 30. Limites de l'audit
 
-Tu dois réellement parcourir les fichiers.
+Préciser que l'analyse est statique et indiquer ce qui nécessiterait :
 
-Ne te contente surtout pas d'une analyse théorique basée sur les noms des fichiers.
+* accès à l'environnement ;
+* scanner de vulnérabilités ;
+* tests réseau ;
+* test de configuration serveur ;
+* analyse dynamique ;
+* pentest.
 
-Lorsque tu affirmes qu'une vulnérabilité existe :
+---
 
-**cite systématiquement le fichier, la méthode et les lignes concernées.**
+# 45. EXIGENCES SUR LES NUMÉROS DE LIGNES
 
-Lorsque le problème dépend de la configuration de production, indique clairement :
+Quand ton environnement te permet de déterminer les numéros de lignes, indique-les précisément.
 
-> À vérifier sur l'environnement déployé.
+Exemple :
 
-Lorsque la vulnérabilité ne peut être confirmée que par exécution :
+```text
+src/ServiceTracePriv/Database.cs:87-93
+```
 
-> À confirmer par test dynamique.
+Si le numéro exact n'est pas disponible, ne l'invente pas.
 
-Ne modifie rien.
+Utilise :
 
-Commence maintenant par :
+```text
+Ligne : non déterminée automatiquement
+```
 
-1. inventorier le repository ;
-2. identifier l'architecture ;
-3. identifier les entrées externes ;
-4. suivre les flux de données ;
-5. effectuer l'audit ;
-6. produire le rapport final complet.
+mais donne :
+
+* fichier ;
+* classe ;
+* méthode ;
+* extrait concerné.
+
+---
+
+# 46. EXTRAITS DE CODE
+
+N'inclus que les extraits strictement nécessaires pour démontrer une vulnérabilité.
+
+Évite de copier de très grandes fonctions.
+
+Pour les secrets :
+
+```csharp
+Password = "********"
+```
+
+et jamais la valeur réelle.
+
+---
+
+# 47. NE PAS CONFONDRE RECOMMANDATION ET CORRECTION
+
+Tu dois expliquer comment corriger les vulnérabilités dans `SECURITY_AUDIT.md`.
+
+Mais :
+
+**NE MODIFIE PAS LE CODE POUR LES CORRIGER.**
+
+Par exemple :
+
+```markdown
+### Correction recommandée
+
+Remplacer la concaténation SQL par une requête paramétrée utilisant
+`SqlParameter`.
+```
+
+Mais ne réalise pas toi-même cette modification.
+
+---
+
+# 48. CONTRÔLE FINAL DU PÉRIMÈTRE
+
+Avant de terminer :
+
+1. vérifie `git diff` si l'environnement le permet ;
+2. vérifie `git status` si l'environnement le permet ;
+3. assure-toi que tu n'as modifié aucun fichier applicatif ;
+4. assure-toi que seul `SECURITY_AUDIT.md` a été créé/modifié par ton intervention.
+
+Attention : il peut exister des modifications Git antérieures à ton intervention.
+
+Ne les modifie pas.
+
+Ne les annule pas.
+
+Ne les attribue pas à ton audit.
+
+Dans le rapport, ajoute à la fin :
+
+```markdown
+## Contrôle d'intégrité de l'audit
+
+- Fichiers applicatifs modifiés par l'audit : 0
+- Fichier créé/modifié par l'audit : `SECURITY_AUDIT.md`
+```
+
+Si tu as accidentellement modifié un fichier applicatif, annule uniquement **tes propres changements** sur ce fichier sans toucher aux changements préexistants.
+
+---
+
+# 49. NE PAS INTERROMPRE L'AUDIT APRÈS QUELQUES FINDINGS
+
+Même si tu trouves une vulnérabilité critique rapidement, continue l'analyse.
+
+Tu dois couvrir au minimum :
+
+* architecture ;
+* secrets ;
+* SQL ;
+* WCF ;
+* SOAP ;
+* XML ;
+* XXE ;
+* SSRF ;
+* désérialisation ;
+* fichiers ;
+* commandes système ;
+* authentification ;
+* autorisation ;
+* validation ;
+* logs ;
+* erreurs ;
+* cryptographie ;
+* TLS ;
+* tailles et quotas ;
+* DoS ;
+* Docker ;
+* dépendances ;
+* framework ;
+* SQL Server ;
+* SARIF ;
+* tests ;
+* OWASP.
+
+---
+
+# 50. INSTRUCTION D'EXÉCUTION FINALE
+
+Exécute maintenant l'audit complet.
+
+Tu dois :
+
+1. parcourir tout le repository ;
+2. inventorier les fichiers ;
+3. comprendre l'architecture ;
+4. identifier la surface d'attaque ;
+5. rechercher les vulnérabilités ;
+6. suivre les flux de données ;
+7. éliminer autant que possible les faux positifs ;
+8. classifier les findings ;
+9. analyser les tailles et quotas WCF/SOAP ;
+10. analyser SQL, XML, Docker et les dépendances ;
+11. générer le rapport complet ;
+12. **écrire réellement ce rapport dans `SECURITY_AUDIT.md` à la racine du repository** ;
+13. vérifier que tu n'as modifié aucun autre fichier.
+
+## IMPORTANT
+
+Ne te contente pas d'afficher le rapport dans la conversation GitHub Copilot.
+
+**Le livrable attendu est le fichier physique :**
+
+```text
+SECURITY_AUDIT.md
+```
+
+Le fichier doit contenir l'intégralité du rapport et être directement lisible dans VS Code et sur GitHub.
+
+Ne demande pas de confirmation intermédiaire.
+
+Ne corrige aucune vulnérabilité.
+
+Ne modifie aucun fichier source.
+
+Commence immédiatement l'analyse et termine par la création complète de `SECURITY_AUDIT.md`.

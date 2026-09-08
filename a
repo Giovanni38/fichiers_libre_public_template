@@ -1,0 +1,71 @@
+SELECT TOP 100
+    j.name AS JobName,
+    h.step_name,
+    msdb.dbo.agent_datetime(h.run_date, h.run_time) AS ExecutionDate,
+    h.run_status,
+    h.sql_message_id,
+    h.message
+FROM msdb.dbo.sysjobhistory h
+INNER JOIN msdb.dbo.sysjobs j
+    ON h.job_id = j.job_id
+WHERE
+    h.step_id <> 0
+    AND msdb.dbo.agent_datetime(h.run_date, h.run_time)
+        >= DATEADD(HOUR, -24, GETDATE())
+    AND (
+        h.message LIKE '%ACE.OLEDB%'
+        OR h.message LIKE '%7303%'
+        OR h.message LIKE '%7339%'
+    )
+ORDER BY ExecutionDate DESC;
+
+
+
+
+
+
+EXEC master.dbo.xp_enum_oledb_providers;
+
+
+
+
+SELECT
+    name,
+    product,
+    provider,
+    data_source,
+    provider_string
+FROM sys.servers
+WHERE is_linked = 1;
+
+
+EXEC master.dbo.sp_testlinkedserver N'Tnull';
+
+
+
+SELECT
+    servicename,
+    service_account,
+    status_desc,
+    startup_type_desc
+FROM sys.dm_server_services;
+
+
+-- 1
+EXEC master.dbo.xp_enum_oledb_providers;
+
+
+-- 2
+SELECT name, provider, data_source, provider_string
+FROM sys.servers
+WHERE is_linked = 1;
+
+
+-- 3
+EXEC master.dbo.sp_testlinkedserver N'Tnull';
+
+
+
+-- 4
+SELECT servicename, service_account, status_desc
+FROM sys.dm_server_services;

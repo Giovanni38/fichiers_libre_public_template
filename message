@@ -1,0 +1,39 @@
+Modifie uniquement les sections « Détails de la version », « Documents » et leurs modals. Ne modifie PAS « Historique des versions ».
+
+### 1. Détails de la version
+Créer une présentation moderne de type Release Notes, élégante, responsive et aérée :
+- En-tête : « Version X.X.X », date, environnement et badges.
+- Sous l'en-tête : résumé de la version.
+- Section « Nouveautés » : liste des fonctionnalités, chacune avec titre en gras et description.
+- Sous chaque fonctionnalité : ses correctifs éventuels, clairement indentés.
+- Section « Correctifs » : correctifs indépendants, avec titre en gras et description.
+- Masquer les sections vides. Aucun texte tronqué.
+
+### 2. Modal Ajouter / Modifier une version
+Conserver les champs existants. Ajouter :
+- Résumé de version.
+- Bouton « + Ajouter une fonctionnalité ».
+- Pour chaque fonctionnalité : titre, description, bouton « + Ajouter un correctif », modification et suppression.
+- Section « Correctifs indépendants » avec bouton « + Ajouter un correctif ».
+- Chaque correctif possède un titre et une description.
+- Ajout/suppression dynamique sans rechargement, confirmation si nécessaire, validation des champs et sauvegarde cohérente.
+
+### 3. Base de données
+Une version possède 0..N fonctionnalités et 0..N correctifs indépendants. Une fonctionnalité possède 0..N correctifs. Un correctif appartient éventuellement à une fonctionnalité.
+
+Adapter API, modèles et persistance. Fournir un script SQL manuel créant/modifiant les tables nécessaires. Migrer l'ancien contenu `release_note` vers une fonctionnalité avant suppression éventuelle de la colonne. Préserver toutes les données.
+
+### 4. Section Documents
+Remplacer le tableau actuel par une présentation épurée avec trois lignes ou cartes compactes :
+- Documentation fonctionnelle — Wiki
+- Documentation technique — Git
+- Flash PIC — lien
+
+Chaque élément affiche une icône, un intitulé unique, son état et un bouton « Ouvrir » si le lien existe. Éviter toute répétition de libellés. Afficher « Non renseigné » si absent.
+
+Masquer les boutons « Ajouter un document » et « Upload Flash PIC », sans supprimer leurs fonctionnalités internes.
+
+### 5. Modal Modifier la documentation
+Conserver les champs Wiki et Git. Ajouter un troisième champ « Lien Flash PIC » avec validation URL. Présentation soignée, champs alignés, boutons Annuler/Enregistrer.
+
+Respecter le design existant, les droits d'accès et l'architecture. Ne pas refactoriser les autres modules. Vérifier création, édition, affichage, migration et absence de régression. Fournir les scripts SQL sans les exécuter.
